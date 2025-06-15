@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const API = "https://ifsc-proxy.ifsc-proxy.workers.dev";
+const API = "https://ifsc-proxy.ifsc-proxy.workers.dev/api";
 
 type Branch = {
   IFSC: string;
