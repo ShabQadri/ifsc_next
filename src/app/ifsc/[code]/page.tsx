@@ -11,7 +11,7 @@ async function fetchIfscData(code: string) {
   return res.json();
 }
 
-// Dynamic metadata for SEO
+// SEO metadata function
 export async function generateMetadata({
   params,
 }: {
@@ -19,22 +19,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const code = params.code.toUpperCase();
   const data = await fetchIfscData(code);
-  if (!data)
-    return {
-      title: `IFSC Not Found`,
-    };
+  if (!data) return { title: `IFSC Not Found` };
   return {
     title: `${code} - ${data.BANK} Branch IFSC Details`,
     description: `Branch details for IFSC ${code}: ${data.BANK}, ${data.BRANCH}, ${data.ADDRESS}`,
   };
 }
 
-// THE DEFAULT EXPORT FUNCTION MUST BE LIKE THIS:
-export default async function Page({
-  params,
-}: {
-  params: { code: string };
-}) {
+// The default export *must* be named 'Page' or default, and destructure { params }
+export default async function Page({ params }: { params: { code: string } }) {
   const code = params.code.toUpperCase();
   const data = await fetchIfscData(code);
 
