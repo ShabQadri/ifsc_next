@@ -1,103 +1,179 @@
-import Image from "next/image";
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+const API = 'https://ifsc-proxy.ifsc-proxy.workers.dev';
+
+type Branch = {
+  IFSC: string;
+  BANK: string;
+  BRANCH: string;
+  STATE: string;
+  DISTRICT: string;
+  CITY: string;
+  ADDRESS: string;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const [tab, setTab] = useState<'location' | 'ifsc'>('location');
+  const [banks, setBanks] = useState<string[]>([]);
+  const [states, setStates] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [selected, setSelected] = useState({
+    bank: '',
+    state: '',
+    district: '',
+    branch: '',
+  });
+  const [ifsc, setIfsc] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Fetch banks on load
+  useEffect(() => {
+    fetch(`${API}/banks`).then(r => r.json()).then(setBanks);
+  }, []);
+
+  // Fetch states when bank selected
+  useEffect(() => {
+    if (selected.bank)
+      fetch(`${API}/states/${encodeURIComponent(selected.bank)}`).then(r => r.json()).then(setStates);
+    else
+      setStates([]);
+    setSelected(prev => ({ ...prev, state: '', district: '', branch: '' }));
+    setDistricts([]);
+    setBranches([]);
+  }, [selected.bank]);
+
+  // Fetch districts when state selected
+  useEffect(() => {
+    if (selected.bank && selected.state)
+      fetch(`${API}/districts/${encodeURIComponent(selected.bank)}/${encodeURIComponent(selected.state)}`)
+        .then(r => r.json()).then(setDistricts);
+    else
+      setDistricts([]);
+    setSelected(prev => ({ ...prev, district: '', branch: '' }));
+    setBranches([]);
+  }, [selected.state]);
+
+  // Fetch branches when district selected
+  useEffect(() => {
+    if (selected.bank && selected.state && selected.district)
+      fetch(`${API}/branches/${encodeURIComponent(selected.bank)}/${encodeURIComponent(selected.state)}/${encodeURIComponent(selected.district)}`)
+        .then(r => r.json()).then(setBranches);
+    else
+      setBranches([]);
+    setSelected(prev => ({ ...prev, branch: '' }));
+  }, [selected.district]);
+
+  function resetForm() {
+    setSelected({ bank: '', state: '', district: '', branch: '' });
+    setBranches([]);
+    setDistricts([]);
+    setStates([]);
+  }
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', marginBottom: 30 }}>
+        <img src="https://ifsc-lookup.pages.dev/icon.png" alt="" width={48} height={48} style={{ marginBottom: 8 }} />
+        <h1 style={{ marginBottom: 6 }}>IFSC Code Lookup</h1>
+        <div style={{ color: '#555', fontSize: '1.15em', marginBottom: 18 }}>
+          Find Indian Financial System Codes for banks across India. Search by bank, state, district, branch, or IFSC code.
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+          <button className={`btn btn-primary${tab === 'location' ? '' : ' btn-secondary'}`}
+            onClick={() => setTab('location')}>
+            Search by Location
+          </button>
+          <button className={`btn btn-primary${tab === 'ifsc' ? '' : ' btn-secondary'}`}
+            onClick={() => setTab('ifsc')}>
+            Search by IFSC
+          </button>
+        </div>
+      </div>
+
+      {tab === 'location' && (
+        <div className="search-card">
+          <form onSubmit={e => {
+            e.preventDefault();
+            if (selected.branch) router.push(`/ifsc/${selected.branch}`);
+          }}>
+            <div className="form-row">
+              <select
+                value={selected.bank}
+                onChange={e => setSelected({ bank: e.target.value, state: '', district: '', branch: '' })}
+                required>
+                <option value="">Bank Name</option>
+                {banks.map(b => <option value={b} key={b}>{b}</option>)}
+              </select>
+              <select
+                value={selected.state}
+                onChange={e => setSelected(prev => ({ ...prev, state: e.target.value, district: '', branch: '' }))}
+                disabled={!selected.bank} required>
+                <option value="">Select State</option>
+                {states.map(s => <option value={s} key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div className="form-row">
+              <select
+                value={selected.district}
+                onChange={e => setSelected(prev => ({ ...prev, district: e.target.value, branch: '' }))}
+                disabled={!selected.state} required>
+                <option value="">Select District</option>
+                {districts.map(d => <option value={d} key={d}>{d}</option>)}
+              </select>
+              <select
+                value={selected.branch}
+                onChange={e => setSelected(prev => ({ ...prev, branch: e.target.value }))}
+                disabled={!selected.district} required>
+                <option value="">Select Branch</option>
+                {branches.map(b => (
+                  <option value={b.IFSC} key={b.IFSC}>
+                    {b.BRANCH} ({b.CITY})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="button-row">
+              <button type="submit" className="btn btn-primary" disabled={!selected.branch}>
+                🔍 Find IFSC Code
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {tab === 'ifsc' && (
+        <div className="search-card" style={{ maxWidth: 400, margin: "28px auto" }}>
+          <form onSubmit={e => {
+            e.preventDefault();
+            if (ifsc.trim()) router.push(`/ifsc/${ifsc.trim().toUpperCase()}`);
+          }}>
+            <input
+              type="text"
+              placeholder="Enter IFSC code"
+              value={ifsc}
+              onChange={e => setIfsc(e.target.value.toUpperCase())}
+              maxLength={20}
+              style={{
+                padding: 12, fontSize: '1.1em', width: '100%',
+                border: '1px solid #1976d2', borderRadius: 6,
+                marginBottom: 18, textTransform: 'uppercase'
+              }}
+              required
+            />
+            <div className="button-row">
+              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                Search IFSC
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }
