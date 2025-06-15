@@ -1,23 +1,19 @@
-import './globals.css';
-import type { Metadata } from 'next';
+import "./globals.css";
+import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
-  title: 'IFSC Code Lookup',
-  description: 'Find Indian Financial System Codes for banks across India. Search by bank, state, district, branch, or IFSC code.',
+export const metadata = {
+  title: "IFSC Code Lookup",
+  description: "Find Indian Financial System Codes for banks across India.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body>
-        <div className="site-bg">
-          <main className="main-container">
-            {children}
-          </main>
-        </div>
-        <footer className="footer">
-          &copy; {new Date().getFullYear()} IFSC Lookup &mdash; Powered by Next.js &amp; Vercel
-        </footer>
+        <div className="main-container">{children}</div>
       </body>
     </html>
   );

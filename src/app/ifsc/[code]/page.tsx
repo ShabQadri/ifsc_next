@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
 
-// Fetch IFSC data from your API
 async function fetchIfscData(code: string) {
   const res = await fetch(
     `https://ifsc-proxy.ifsc-proxy.workers.dev/ifsc/${code}`,
@@ -11,7 +10,6 @@ async function fetchIfscData(code: string) {
   return res.json();
 }
 
-// SEO metadata function
 export async function generateMetadata({
   params,
 }: {
@@ -26,7 +24,6 @@ export async function generateMetadata({
   };
 }
 
-// The default export *must* be named 'Page' or default, and destructure { params }
 export default async function Page({ params }: { params: { code: string } }) {
   const code = params.code.toUpperCase();
   const data = await fetchIfscData(code);
