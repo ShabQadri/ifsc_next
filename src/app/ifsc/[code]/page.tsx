@@ -7,6 +7,7 @@ async function fetchIfscData(code: string) {
   return res.json();
 }
 
+// Correct signature for generateMetadata in Next.js app router:
 export async function generateMetadata({ params }: { params: { code: string } }): Promise<Metadata> {
   const code = params.code.toUpperCase();
   const data = await fetchIfscData(code);
@@ -17,6 +18,7 @@ export async function generateMetadata({ params }: { params: { code: string } })
   };
 }
 
+// The page component, which must be an async function:
 export default async function IfscPage({ params }: { params: { code: string } }) {
   const code = params.code.toUpperCase();
   const data = await fetchIfscData(code);
