@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const API = 'https://ifsc-proxy.ifsc-proxy.workers.dev';
 
@@ -54,7 +56,7 @@ export default function Home() {
       setDistricts([]);
     setSelected(prev => ({ ...prev, district: '', branch: '' }));
     setBranches([]);
-  }, [selected.state]);
+  }, [selected.state, selected.bank]);
 
   // Fetch branches when district selected
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function Home() {
     else
       setBranches([]);
     setSelected(prev => ({ ...prev, branch: '' }));
-  }, [selected.district]);
+  }, [selected.district, selected.state, selected.bank]);
 
   function resetForm() {
     setSelected({ bank: '', state: '', district: '', branch: '' });
@@ -76,7 +78,7 @@ export default function Home() {
   return (
     <>
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
-        <img src="https://ifsc-lookup.pages.dev/icon.png" alt="" width={48} height={48} style={{ marginBottom: 8 }} />
+        <Image src="https://ifsc-lookup.pages.dev/icon.png" alt="" width={48} height={48} style={{ marginBottom: 8 }} />
         <h1 style={{ marginBottom: 6 }}>IFSC Code Lookup</h1>
         <div style={{ color: '#555', fontSize: '1.15em', marginBottom: 18 }}>
           Find Indian Financial System Codes for banks across India. Search by bank, state, district, branch, or IFSC code.
@@ -174,6 +176,8 @@ export default function Home() {
           </form>
         </div>
       )}
+      {/* Example of using Link for home navigation elsewhere */}
+      {/* <Link href="/">Back to Home</Link> */}
     </>
   );
 }

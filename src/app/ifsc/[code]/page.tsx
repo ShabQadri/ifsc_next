@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 async function fetchIfscData(code: string) {
   const res = await fetch(`https://ifsc-proxy.ifsc-proxy.workers.dev/ifsc/${code}`, { cache: 'force-cache' });
@@ -27,7 +28,7 @@ export default async function IfscPage({ params }: { params: { code: string } })
         <div style={{ color: 'red', fontSize: '1.2em', margin: "2em 0" }}>
           IFSC code <b>{code}</b> not found.
         </div>
-        <a href="/" style={{ color: '#1976d2', textDecoration: 'underline' }}>&#8592; Back to search</a>
+        <Link href="/" style={{ color: '#1976d2', textDecoration: 'underline' }}>&#8592; Back to search</Link>
       </>
     );
   }
@@ -56,7 +57,7 @@ export default async function IfscPage({ params }: { params: { code: string } })
         <div><b>RTGS:</b> {data.RTGS ? 'Yes' : 'No'}</div>
         <div><b>SWIFT:</b> {data.SWIFT || '-'}</div>
       </div>
-      <a href="/" style={{ color: '#1976d2', textDecoration: 'underline' }}>&#8592; Back to search</a>
+      <Link href="/" style={{ color: '#1976d2', textDecoration: 'underline' }}>&#8592; Back to search</Link>
     </>
   );
 }
